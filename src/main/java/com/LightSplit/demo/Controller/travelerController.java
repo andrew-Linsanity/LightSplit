@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.LightSplit.demo.Exception.travellerCollectionException;
 import com.LightSplit.demo.Model.Traveler;
 import com.LightSplit.demo.Repository.travelerRepository;
-import com.LightSplit.demo.Service.TravelerServiceIMPL;
+import com.LightSplit.demo.Service.TravelerService;
 
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,7 +28,7 @@ public class travelerController {
     private travelerRepository travRepo;
 
     @Autowired
-    private TravelerServiceIMPL travService;
+    private TravelerService travService;
 
     @GetMapping("/travelers")
     public ResponseEntity<?> getAllTravelers() {
