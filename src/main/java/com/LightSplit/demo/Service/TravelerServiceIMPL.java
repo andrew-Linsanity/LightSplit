@@ -10,7 +10,7 @@ import com.LightSplit.demo.Repository.travelerRepository;
 import jakarta.validation.ConstraintViolationException;
 
 @Service
-public class TravelerServiceIMPL {
+public class TravelerServiceIMPL implements TravelerService {
     
     @Autowired
     private travelerRepository travRepo;
@@ -22,6 +22,6 @@ public class TravelerServiceIMPL {
             travRepo.save(traveler);
         }
     } 
-    
+
 
 }

@@ -129,7 +129,7 @@ public class groupController {
     }
 
     // DeleteMapping: remove traveler from a group
-    @DeleteMapping("/group/{groupId}/traveler/{travelerId}")
+    // @DeleteMapping("/group/{groupId}/traveler/{travelerId}")
     
     // DeleteMapping
 }
