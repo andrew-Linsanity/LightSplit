@@ -1,5 +1,7 @@
 package com.LightSplit.demo.Model;
 
+import java.util.Objects;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -23,4 +25,17 @@ public class Traveler {
     private String nickName;
     
     private int balance = 0;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Traveler traveler = (Traveler) o;
+        return Objects.equals(id, traveler.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }
