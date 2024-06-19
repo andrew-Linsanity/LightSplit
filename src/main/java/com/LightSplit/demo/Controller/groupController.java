@@ -1,6 +1,5 @@
 package com.LightSplit.demo.Controller;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -107,24 +106,22 @@ public class groupController {
     public ResponseEntity<?> addSingleTravelerToGroup(@PathVariable String groupId, @PathVariable String travelerId) {
         Optional<Group> groupOptional = groupRepo.findById(groupId);
         Optional<Traveler> travelerOptional = travRepo.findById(travelerId);
-        if(groupOptional.isPresent()) {
-            if(travelerOptional.isPresent()) {
-                HashSet<String> set = new HashSet<>();
-                String newName = travelerOptional.get().getNickName();
-                // check if traveler's name already exist in the group
-                Group group = groupOptional.get();
-                for(Traveler trav : group.getTravelers()) {
-                    set.add(trav.getNickName());
-                }
-                if(set.contains(newName)) return new ResponseEntity<String>(newName + " already exists in the Group.", HttpStatus.CONFLICT);
-                group.getTravelers().add(travelerOptional.get());
-                groupRepo.save(group);
-                return new ResponseEntity<Group>(group, HttpStatus.OK);
-            } else {
-                return new ResponseEntity<String>("Traveler with ID: " + travelerId + "is not found.", HttpStatus.NOT_FOUND);
-            }
-        } else {
+        if(!groupOptional.isPresent()) {
             return new ResponseEntity<String>("Group with ID: " + groupId + "is not found.", HttpStatus.NOT_FOUND);
+        }
+        if(!travelerOptional.isPresent()) {
+            return new ResponseEntity<String>("Traveler with ID: " + travelerId + "is not found.", HttpStatus.NOT_FOUND);
+        }
+        Group group = groupOptional.get();
+        List<Traveler> groupTravelers = group.getTravelers();
+        Traveler travelerTarget = travelerOptional.get();
+        // delete the travler from the group
+        if(!groupTravelers.contains(travelerTarget)) {
+            groupTravelers.add(travelerTarget);
+            groupRepo.save(group);
+            return new ResponseEntity<Group>(group, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<String>("Traveler with id: " + travelerId + " exists in the group", HttpStatus.CONFLICT);
         }
     }
 
@@ -132,4 +129,27 @@ public class groupController {
     // @DeleteMapping("/group/{groupId}/traveler/{travelerId}")
     
     // DeleteMapping
+    @DeleteMapping("group/{groupId}/traveler/{travelerId}")
+    public ResponseEntity<?> deleteSingleTravelerFromGroup(@PathVariable String groupId, @PathVariable String travelerId) {
+        Optional<Group> groupOptional= groupRepo.findById(groupId);
+        Optional<Traveler> travelerOptional = travRepo.findById(travelerId);
+        if(!groupOptional.isPresent()) {
+            return new ResponseEntity<String>("Group with id: " + groupId + " is not found.", HttpStatus.NOT_FOUND);
+        }
+        if(!travelerOptional.isPresent()) {
+            return new ResponseEntity<String>("Traveler with id: " + travelerId + " is not found.", HttpStatus.NOT_FOUND);
+        }
+
+        Group group = groupOptional.get();
+        List<Traveler> groupTravelers = group.getTravelers();
+        Traveler travelerTarget = travelerOptional.get();
+        // delete the travler from the group
+        if(groupTravelers.contains(travelerTarget)) {
+            groupTravelers.remove(travelerTarget);
+            groupRepo.save(group);
+            return new ResponseEntity<Group>(group, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<String>("Traveler " + travelerId + " is not found in the group.", HttpStatus.NOT_FOUND);
+        }
+    }
 }
