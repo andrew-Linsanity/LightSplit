@@ -121,7 +121,7 @@ public class groupController {
             groupRepo.save(group);
             return new ResponseEntity<Group>(group, HttpStatus.OK);
         } else {
-            return new ResponseEntity<String>("Traveler with id: " + travelerId + " exists in the group", HttpStatus.CONFLICT);
+            return new ResponseEntity<String>("Traveler with id: " + travelerId + " already exists in the group", HttpStatus.CONFLICT);
         }
     }
 
@@ -150,6 +150,6 @@ public class groupController {
             return new ResponseEntity<Group>(group, HttpStatus.OK);
         } else {
             return new ResponseEntity<String>("Traveler " + travelerId + " is not found in the group.", HttpStatus.NOT_FOUND);
-        }
+        } 
     }
 }
