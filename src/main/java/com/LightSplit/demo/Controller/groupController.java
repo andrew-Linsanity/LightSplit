@@ -1,5 +1,6 @@
 package com.LightSplit.demo.Controller;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -190,6 +191,62 @@ public class groupController {
             }
         }
         
+        // Save the group after updating the travelers' balances
+        groupRepo.save(group);
+
+        return new ResponseEntity<>(group, HttpStatus.OK);
+    } 
+    
+    /* FrontEnd: It will be nice if front end shows the expected amount payed by the last traveler in the group!
+    /* Update balance, paid and shared by who with customized amount */
+    // 1. in the request body, use balance field to save the amount travlers owed. Set it back to 0 after accounted for in the group. 
+    // 1.1 Actually might not need to set to 0. Just don't save them to travRepo at last. 
+    // 1.2 So the balance field in travRepository is like a temp variable for the updated balance 
+    @PutMapping("customization/group/{groupId}/payment/{cost}/traveler/{payerId}")
+    public ResponseEntity<?> splitCostCustomized(@PathVariable double cost, @PathVariable String groupId, @PathVariable String payerId, @RequestBody List<Traveler> travelers) {
+        Optional<Group> groupOptional= groupRepo.findById(groupId);
+        if (!groupOptional.isPresent()) {
+            return new ResponseEntity<>("Group with id: " + groupId + " is not found.", HttpStatus.NOT_FOUND);
+        }
+        
+        Group group = groupOptional.get();
+        List<Traveler> groupTravelers = group.getTravelers();
+        Optional<Traveler> payerOptional = travRepo.findById(payerId);
+
+        if(!payerOptional.isPresent()) return new ResponseEntity<>("Payer with id: " + groupId + " is not found.", HttpStatus.NOT_FOUND);
+        Traveler payer = payerOptional.get();
+
+        if(!groupTravelers.contains(payer)) return new ResponseEntity<>("Payer with id: " + groupId + " is not in the group.", HttpStatus.NOT_FOUND);
+        
+        HashMap<Traveler, Double> travCostMap = new HashMap<>();
+
+        // Check if all travelers in the request body are in the group
+        Double checkSum = cost;
+
+        for (Traveler traveler : travelers) {
+            if (!groupTravelers.contains(traveler)) {
+                return new ResponseEntity<>("Traveler " + traveler.getId() + " is not in the group: " + groupId + ".", HttpStatus.NOT_FOUND);
+            } else if(traveler.getBalance() == 0) { // Catch exceptino when the amount owed is 0; or if the field is null (no need, taken care of by the validation class)
+                return new ResponseEntity<String>("Traveler with id: " + traveler.getId() + " cannot have balance = 0.", HttpStatus.CONFLICT);
+            } else {  // 1. save the selected list of traveler in a Map<Traveler, Double>; 
+                travCostMap.put(traveler, traveler.getBalance()); 
+                checkSum -= traveler.getBalance(); 
+            }
+        } 
+        // check if sum doesn't add up: no need to run a for loop again!!! 
+        if(checkSum != 0) return new ResponseEntity<String>("Total shared amounts don't add up with the cost.", HttpStatus.CONFLICT);
+        // Update groupTraveler's balance
+        // 2. for loop through groupTravelers, and find key (travleer)
+        for(Traveler groupTraveler : groupTravelers) {
+            double curBalance = groupTraveler.getBalance();
+            double updateBalance = travCostMap.get(groupTraveler);
+            if(groupTraveler.equals(payer)) {
+                groupTraveler.setBalance(curBalance - updateBalance + cost);
+            } else {
+                groupTraveler.setBalance(curBalance - updateBalance);
+            }
+        } 
+
         // Save the group after updating the travelers' balances
         groupRepo.save(group);
 
