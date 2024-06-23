@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.LightSplit.demo.Exception.GroupCollectionException;
 import com.LightSplit.demo.Model.Group;
+import com.LightSplit.demo.Model.Traveler;
 import com.LightSplit.demo.Repository.groupRepository;
 
 import jakarta.validation.ConstraintViolationException;
@@ -81,5 +82,10 @@ public class GroupServiceIMPL implements GroupService {
     @Override
     public void deleteAllGroups() {
         groupRepo.deleteAll();
+    }
+
+    @Override
+    public List<Traveler> findAllTravelers(Group group) {
+        return group.getTravelers();
     }
 }

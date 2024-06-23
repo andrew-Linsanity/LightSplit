@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.LightSplit.demo.Exception.GroupCollectionException;
 import com.LightSplit.demo.Model.Group;
+import com.LightSplit.demo.Model.Traveler;
 
 import jakarta.validation.ConstraintViolationException;
 
@@ -23,4 +24,6 @@ public interface GroupService {
     public Group deleteById(String groupId) throws GroupCollectionException;
 
     public void deleteAllGroups();
+
+    public List<Traveler> findAllTravelers(Group group);
 } 

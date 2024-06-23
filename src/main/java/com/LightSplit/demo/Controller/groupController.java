@@ -152,4 +152,47 @@ public class groupController {
             return new ResponseEntity<String>("Traveler " + travelerId + " is not found in the group.", HttpStatus.NOT_FOUND);
         } 
     }
+
+    // Update balance, payed by who, and shared by who; split equally
+    @PutMapping("group/{groupId}/payment/{cost}/traveler/{payerId}")
+    public ResponseEntity<?> splitCostEqually(@PathVariable double cost, @PathVariable String groupId, @PathVariable String payerId, @RequestBody List<Traveler> travelers) {
+        Optional<Group> groupOptional= groupRepo.findById(groupId);
+        if (!groupOptional.isPresent()) {
+            return new ResponseEntity<>("Group with id: " + groupId + " is not found.", HttpStatus.NOT_FOUND);
+        }
+
+        Group group = groupOptional.get();
+        List<Traveler> groupTravelers = group.getTravelers();
+        Optional<Traveler> payerOptional = travRepo.findById(payerId);
+
+        if(!payerOptional.isPresent()) return new ResponseEntity<>("Payer with id: " + groupId + " is not found.", HttpStatus.NOT_FOUND);
+        Traveler payer = payerOptional.get();
+
+        if(!groupTravelers.contains(payer)) return new ResponseEntity<>("Payer with id: " + groupId + " is not in the group.", HttpStatus.NOT_FOUND);
+    
+        // Calculate the split cost
+        double splitCost = cost / travelers.size();
+    
+        // Check if all travelers in the request body are in the group
+        for (Traveler traveler : travelers) {
+            if (!groupTravelers.contains(traveler)) {
+                return new ResponseEntity<>("Traveler " + traveler.getId() + " is not in the group: " + groupId + ".", HttpStatus.NOT_FOUND);
+            }
+        }
+        
+        // Update the balance of the travelers in the group
+        for (Traveler groupTraveler : groupTravelers) {
+            if (travelers.contains(groupTraveler)) {
+                groupTraveler.setBalance(groupTraveler.getBalance() - splitCost);
+            }
+            if (groupTraveler.equals(payer)) {
+                groupTraveler.setBalance(groupTraveler.getBalance() + cost);
+            }
+        }
+        
+        // Save the group after updating the travelers' balances
+        groupRepo.save(group);
+
+        return new ResponseEntity<>(group, HttpStatus.OK);
+    }
 }
