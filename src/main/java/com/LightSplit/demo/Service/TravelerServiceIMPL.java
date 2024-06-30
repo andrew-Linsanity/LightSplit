@@ -16,12 +16,10 @@ public class TravelerServiceIMPL implements TravelerService {
     private travelerRepository travRepo;
     
     public void createTraveler(Traveler traveler) throws ConstraintViolationException, travellerCollectionException {
-        if(traveler.getNickName() == "") {
+        if(traveler.getNickName() == "" || traveler.getNickName() == null) {
             throw new travellerCollectionException(travellerCollectionException.InvalidNickName());
         } else {
             travRepo.save(traveler);
         }
     } 
-
-
 }

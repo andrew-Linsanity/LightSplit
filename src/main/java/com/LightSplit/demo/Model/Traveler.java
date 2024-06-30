@@ -21,12 +21,11 @@ public class Traveler {
     @Id
     private String id;
 
-    @NotNull
     private String nickName;
     
     private double balance = 0;
 
-    // I'm really not confused by what's happening here 
+    // I'm really confused by what's happening here 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true; // A
