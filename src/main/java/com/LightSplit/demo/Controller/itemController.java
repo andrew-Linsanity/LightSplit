@@ -23,16 +23,20 @@ public class itemController {
     
     @PostMapping("/item") 
     public ResponseEntity<?> createItem(@RequestBody Item item) {
-        itemRepo.save(item);
-        return new ResponseEntity<Item>(item, HttpStatus.OK);
+        try {
+            itemRepo.save(item);
+            return new ResponseEntity<>(item, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
     
     /* delete the an item */
     // Make sure to reverse the payments. How ???????  
     // 2. add a global variable map that stores the transaction
-    @DeletetEntity("/item")
-    public ResponseEntity<?> deleItem(@RequestBody Item item) {
+    // @DeletetEntity("/item")
+    // public ResponseEntity<?> deleItem(@RequestBody Item item) {
 
-    }
+    // }
     
 }

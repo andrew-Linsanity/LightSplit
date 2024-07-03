@@ -192,6 +192,7 @@ public class groupController {
                 return new ResponseEntity<>("Traveler " + traveler.getId() + " is not in the group: " + groupId + ".", HttpStatus.NOT_FOUND);
             }
         }
+        
         HashMap<Traveler,Double> travCostMap = new HashMap<>();
         // Update the balance of the travelers in the group
         for (Traveler groupTraveler : groupTravelers) {
