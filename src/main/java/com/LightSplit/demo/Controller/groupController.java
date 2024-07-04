@@ -66,7 +66,7 @@ public class groupController {
         }
     }
     /* Get a single group */
-    @GetMapping("/groups/{id}")
+    @GetMapping("/group/{id}")
     public ResponseEntity<?> getSingleGroup(@PathVariable("id") String id) {
         try {
             return new ResponseEntity<Group>(groupService.getSingleGroup(id), HttpStatus.OK);
@@ -106,59 +106,6 @@ public class groupController {
         return new ResponseEntity<String>("Successfully deleted every group!", HttpStatus.OK);
     }
 
-    /* Add traveler to a group */
-    // Question: make sure there's no duplicate names in a group
-    @PutMapping("/group/{groupId}/traveler/{travelerId}")
-    public ResponseEntity<?> addSingleTravelerToGroup(@PathVariable String groupId, @PathVariable String travelerId) {
-        Optional<Group> groupOptional = groupRepo.findById(groupId);
-        Optional<Traveler> travelerOptional = travRepo.findById(travelerId);
-        if(!groupOptional.isPresent()) {
-            return new ResponseEntity<String>("Group with ID: " + groupId + "is not found.", HttpStatus.NOT_FOUND);
-        }
-        if(!travelerOptional.isPresent()) {
-            return new ResponseEntity<String>("Traveler with ID: " + travelerId + "is not found.", HttpStatus.NOT_FOUND);
-        }
-        Group group = groupOptional.get();
-        List<Traveler> groupTravelers = group.getTravelers();
-        Traveler travelerTarget = travelerOptional.get();
-        // delete the travler from the group
-        if(!groupTravelers.contains(travelerTarget)) {
-            groupTravelers.add(travelerTarget);
-            groupRepo.save(group);
-            return new ResponseEntity<Group>(group, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<String>("Traveler with id: " + travelerId + " already exists in the group", HttpStatus.CONFLICT);
-        }
-    }
-
-    // DeleteMapping: remove traveler from a group
-    // @DeleteMapping("/group/{groupId}/traveler/{travelerId}")
-    
-    // DeleteMapping
-    @DeleteMapping("group/{groupId}/traveler/{travelerId}")
-    public ResponseEntity<?> deleteSingleTravelerFromGroup(@PathVariable String groupId, @PathVariable String travelerId) {
-        Optional<Group> groupOptional= groupRepo.findById(groupId);
-        Optional<Traveler> travelerOptional = travRepo.findById(travelerId);
-        if(!groupOptional.isPresent()) {
-            return new ResponseEntity<String>("Group with id: " + groupId + " is not found.", HttpStatus.NOT_FOUND);
-        }
-        if(!travelerOptional.isPresent()) {
-            return new ResponseEntity<String>("Traveler with id: " + travelerId + " is not found.", HttpStatus.NOT_FOUND);
-        }
-
-        Group group = groupOptional.get();
-        List<Traveler> groupTravelers = group.getTravelers();
-        Traveler travelerTarget = travelerOptional.get();
-        // delete the travler from the group
-        if(groupTravelers.contains(travelerTarget)) {
-            groupTravelers.remove(travelerTarget);
-            groupRepo.save(group);
-            return new ResponseEntity<Group>(group, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<String>("Traveler " + travelerId + " is not found in the group.", HttpStatus.NOT_FOUND);
-        } 
-    }
-
     // Update balance, payed by who, and shared by who; split equally
     @PutMapping("item/{itemId}/group/{groupId}/payment/{cost}/traveler/{payerId}")
     public ResponseEntity<?> splitCostEqually(@PathVariable String itemId, @PathVariable double cost, @PathVariable String groupId, @PathVariable String payerId, @RequestBody List<Traveler> travelers) {
@@ -193,7 +140,7 @@ public class groupController {
             }
         }
         
-        HashMap<Traveler,Double> travCostMap = new HashMap<>();
+        HashMap<String,Double> travCostMap = new HashMap<>();
         // Update the balance of the travelers in the group
         for (Traveler groupTraveler : groupTravelers) {
             Double updateBalance = splitCost;
@@ -201,7 +148,7 @@ public class groupController {
                 updateBalance -= cost;
             } 
             groupTraveler.setBalance(groupTraveler.getBalance() - updateBalance);
-            travCostMap.put(groupTraveler, updateBalance);
+            travCostMap.put(groupTraveler.getId(), updateBalance);
         }
         item.setPaymentMap(travCostMap);
         // Save the group after updating the travelers' balances
@@ -236,7 +183,7 @@ public class groupController {
 
         if(!groupTravelers.contains(payer)) return new ResponseEntity<>("Payer with id: " + groupId + " is not in the group.", HttpStatus.NOT_FOUND);
         
-        HashMap<Traveler, Double> travCostMap = new HashMap<>();
+        HashMap<String, Double> travCostMap = new HashMap<>();
 
         // Check if all travelers in the request body are in the group
         Double checkSum = cost;
@@ -248,7 +195,7 @@ public class groupController {
                 return new ResponseEntity<String>("Traveler with id: " + traveler.getId() + " cannot have balance = 0.", HttpStatus.CONFLICT);
             } else {  // 1. save the selected list of traveler in a Map<Traveler, Double>; 
                 checkSum -= traveler.getBalance(); 
-                travCostMap.put(traveler, traveler != payer ? traveler.getBalance() : traveler.getBalance() - cost); // new update, unconfirmed
+                travCostMap.put(traveler.getId(), traveler != payer ? traveler.getBalance() : traveler.getBalance() - cost); // new update, unconfirmed
             }
         } 
         // check if sum doesn't add up: no need to run a for loop again!!! 
@@ -269,4 +216,5 @@ public class groupController {
         
         return new ResponseEntity<>(group, HttpStatus.OK);
     }
+
 }
