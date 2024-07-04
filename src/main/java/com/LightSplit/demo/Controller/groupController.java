@@ -204,7 +204,7 @@ public class groupController {
         // 2. for loop through groupTravelers, and find key (travleer)
         for(Traveler groupTraveler : groupTravelers) {
             double curBalance = groupTraveler.getBalance();
-            double updateBalance = travCostMap.get(groupTraveler);
+            double updateBalance = travCostMap.get(groupTraveler.getId());
             groupTraveler.setBalance(curBalance - updateBalance);
         } 
 
