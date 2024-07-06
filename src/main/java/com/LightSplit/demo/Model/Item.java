@@ -23,7 +23,8 @@ import lombok.Setter;
 public class Item {
     
     @Id
-    private String Id;
+    
+    private String id;
     
     @NotNull
     private String name;

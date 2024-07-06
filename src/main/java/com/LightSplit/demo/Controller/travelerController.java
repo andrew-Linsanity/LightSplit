@@ -1,5 +1,6 @@
 package com.LightSplit.demo.Controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -84,9 +85,9 @@ public class travelerController {
         }
     }
 
-        /* Add traveler to a group */
+    /* Add traveler to a group */
     // Question: make sure there's no duplicate names in a group
-    @PutMapping("/group/{groupId}/traveler/{travelerId}")
+    @PutMapping("/group/{groupId}/traveler/{travelerId}") 
     public ResponseEntity<?> addSingleTravelerToGroup(@PathVariable String groupId, @PathVariable String travelerId) {
         Optional<Group> groupOptional = groupRepo.findById(groupId);
         Optional<Traveler> travelerOptional = travRepo.findById(travelerId);
@@ -148,13 +149,22 @@ public class travelerController {
         }
         Item item = itemOptional.get();
         Traveler targetTraveler = travelerOptional.get();
-        List<Traveler> itemTravelers = item.getTravelers();
-        for (Traveler traveler : itemTravelers) {
-            if (!itemTravelers.contains(traveler)) {
-                return new ResponseEntity<>("Traveler " + traveler.getId() + " is not in the item: " + itemId + ".", HttpStatus.NOT_FOUND);
+        List<Traveler> itemTravelers;
+
+        if(item.getTravelers() == null) {
+            List<Traveler> tempItemTravelers = new ArrayList<>();
+            tempItemTravelers.add(targetTraveler);
+            item.setTravelers(tempItemTravelers);
+        } else {
+            itemTravelers = item.getTravelers();
+            for (Traveler traveler : itemTravelers) {
+                if (!itemTravelers.contains(traveler)) {
+                    return new ResponseEntity<>("Traveler " + traveler.getId() + " is not in the item: " + itemId + ".", HttpStatus.NOT_FOUND);
+                }
             }
-        }
-        itemTravelers.add(targetTraveler);
+            itemTravelers.add(targetTraveler);
+        } 
+
         itemRepo.save(item);
         return new ResponseEntity<Item>(item, HttpStatus.OK);
     }
