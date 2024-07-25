@@ -75,6 +75,7 @@ public class groupController {
             return new ResponseEntity<String>(e.getMessage(), HttpStatus.NOT_FOUND);
         } 
     } 
+    
     /* Ｕpdate group info; name, description, travelers */  
     // When users update the info, will they see empty boxes they need to fill up again, or the previous edition that they can edit?
     // is this backend's responsibility or front end?
@@ -89,7 +90,7 @@ public class groupController {
     }
 
     @DeleteMapping("/group/{groupId}")
-    public ResponseEntity<?> deleteById(@PathVariable("groupId") String groupId) {
+    public ResponseEntity<?> deleteById(@PathVariable String groupId) {
         try {
             groupService.deleteById(groupId);
             return new ResponseEntity<String>("Successfully delete id: " + groupId, HttpStatus.OK);
