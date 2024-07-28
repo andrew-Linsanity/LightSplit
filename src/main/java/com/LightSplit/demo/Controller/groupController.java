@@ -108,6 +108,7 @@ public class groupController {
     }
 
     // Update balance, payed by who, and shared by who; split equally
+    // TODO: Move parameters to body 
     @PutMapping("item/{itemId}/group/{groupId}/payment/{cost}/traveler/{payerId}")
     public ResponseEntity<?> splitCostEqually(@PathVariable String itemId, @PathVariable double cost, @PathVariable String groupId, @PathVariable String payerId, @RequestBody List<Traveler> travelers) {
         Optional<Group> groupOptional= groupRepo.findById(groupId);
@@ -218,4 +219,23 @@ public class groupController {
         return new ResponseEntity<>(group, HttpStatus.OK);
     }
 
+    // PutMapping: finalize minimum transactions, ending the trip
+    // 1. Begin with the list of travelers's balance
+    // 2. Map the most negative to the most positive and canceel each other, then the second most positive.
+    // 2.1 If one of them becomes 0, move on to the second highest.
+    // 3. Structure: two arrays, one with positive balance trav, the other negative, sorted(ZIG ZAG)
+    // 4. Should return a list of "final transactions" objects
+    // 4.1 here we create methods of
+
+    // TODO: test endpoint 
+    @PutMapping("group/{groupId}/finalCost")
+    public ResponseEntity<?> findMinimumTransactions(@PathVariable String groupId) {
+        try {
+            Group group = groupRepo.findById(groupId).get();
+            return new ResponseEntity<>(groupService.finalizeCost(group), HttpStatus.OK);
+
+        } catch(Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+    }
 }

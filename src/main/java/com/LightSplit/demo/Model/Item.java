@@ -24,7 +24,6 @@ import lombok.Setter;
 public class Item {
     
     @Id
-    
     private String id;
     
     @NotNull

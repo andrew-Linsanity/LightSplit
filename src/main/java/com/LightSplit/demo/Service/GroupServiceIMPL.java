@@ -1,6 +1,7 @@
 package com.LightSplit.demo.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.LightSplit.demo.Exception.GroupCollectionException;
+import com.LightSplit.demo.Model.FinalTransactions;
 import com.LightSplit.demo.Model.Group;
 import com.LightSplit.demo.Model.Traveler;
 import com.LightSplit.demo.Repository.groupRepository;
@@ -87,5 +89,47 @@ public class GroupServiceIMPL implements GroupService {
     @Override
     public List<Traveler> findAllTravelers(Group group) {
         return group.getTravelers();
+    }
+
+    @Override
+    public List<FinalTransactions> finalizeCost(Group group) {
+        List<Traveler> travelers = group.getTravelers();
+        ArrayList<Traveler> posTravs = new ArrayList<>();
+        ArrayList<Traveler> negTravs = new ArrayList<>();
+        ArrayList<FinalTransactions> finalTransactList = new ArrayList<>();
+        
+        for(Traveler trav : travelers) {
+            if(trav.getBalance() < 0) {
+                negTravs.add(trav);
+            } else if(trav.getBalance() > 0){
+                posTravs.add(trav);
+            }
+        }
+  
+        for(Traveler negTrav : negTravs) {
+            boolean containsMatch = false;
+            for(Traveler posTrav : posTravs) {
+                if (negTrav.getBalance() + posTrav.getBalance() == 0) {
+                    finalTransactList.add( new FinalTransactions(negTrav, posTrav, -negTrav.getBalance()));
+                    containsMatch = true;
+                } 
+            } 
+            if(containsMatch == false) {
+                while(negTrav.getBalance() != 0) {
+                    Traveler curPosTraveler = posTravs.get(0);
+                    if( -negTrav.getBalance() < curPosTraveler.getBalance()) {
+                        curPosTraveler.setBalance(curPosTraveler.getBalance() + negTrav.getBalance());
+                        negTrav.setBalance(0);
+                        finalTransactList.add( new FinalTransactions(negTrav, curPosTraveler, -negTrav.getBalance()));
+                    } else {
+                        negTrav.setBalance(negTrav.getBalance() + curPosTraveler.getBalance());
+                        posTravs.removeFirst();
+                        finalTransactList.add( new FinalTransactions(negTrav, curPosTraveler, curPosTraveler.getBalance()));
+                    }
+                }
+            }
+        }
+
+        return finalTransactList;
     }
 }

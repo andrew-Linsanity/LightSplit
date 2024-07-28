@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 
 /* When a new transaction occured, users can create a new item object */
 // Error: Maybe I should have designed item controller before the split functions
@@ -60,7 +59,7 @@ public class itemController {
     }
 
     // Add item to item list
-    @PutMapping("/group/{groupId}/aitg")
+    @PutMapping("/group/{groupId}/item")
     public ResponseEntity<?> addItemToGroup(@PathVariable String groupId, @RequestBody String itemId) { // Raw text for the request body
         Optional<Group> groupOptional = groupRepo.findById(groupId);
         Optional<Item> itemOptional = itemRepo.findById(itemId);
@@ -78,7 +77,7 @@ public class itemController {
     // 2. add a global variable map that stores the transaction
     // 3. Potentially I might wanna save the items and transactions history in the itemRepo, but rn let's keep it simple
 
-    @DeleteMapping("group/{groupId}/item/{itemId}")
+    @DeleteMapping("group/{groupId}/item/{itemId}") 
     public ResponseEntity<?> deleteItemFromGroup(@PathVariable String itemId, @PathVariable String groupId) {
         Optional<Group> groupOptional = groupRepo.findById(groupId);
         if(!groupOptional.isPresent()) return new ResponseEntity<>("Group with id: " + groupId + " not found.", HttpStatus.NOT_FOUND);
@@ -98,7 +97,7 @@ public class itemController {
                             break;
                         }
                     }
-                }
+                };
                 break;
             }
         } 
@@ -106,6 +105,5 @@ public class itemController {
         groupRepo.save(group);
         return new ResponseEntity<>(group, HttpStatus.OK);
     }
-
 }
 
