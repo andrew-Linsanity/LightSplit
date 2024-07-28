@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.LightSplit.demo.Exception.GroupCollectionException;
+import com.LightSplit.demo.Model.FinalTransactions;
 import com.LightSplit.demo.Model.Group;
 import com.LightSplit.demo.Model.Traveler;
 
@@ -26,4 +27,6 @@ public interface GroupService {
     public void deleteAllGroups();
 
     public List<Traveler> findAllTravelers(Group group);
+
+    public List<FinalTransactions> finalizeCost(Group group);
 } 

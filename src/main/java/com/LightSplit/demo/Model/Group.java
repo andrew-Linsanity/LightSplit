@@ -1,6 +1,7 @@
 package com.LightSplit.demo.Model;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.annotation.CreatedDate;
@@ -29,10 +30,9 @@ public class Group {
 
     private String description;
 
-    @NotNull(message = "travelers cannot be null.")
     private List<Traveler> travelers;
 
-    // private List<Item> items;
+    private List<Item> items = new ArrayList<>();
 
     @CreatedDate
     private LocalDateTime createdAt;
