@@ -1,16 +1,22 @@
 package com.LightSplit.demo.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.LightSplit.demo.Exception.GroupCollectionException;
+import com.LightSplit.demo.Exception.travelerCollectionException;
 import com.LightSplit.demo.Model.Group;
+import com.LightSplit.demo.Model.Item;
 import com.LightSplit.demo.Model.Traveler;
 import com.LightSplit.demo.Repository.groupRepository;
+import com.LightSplit.demo.Repository.travelerRepository;
 
 import jakarta.validation.ConstraintViolationException;
 
@@ -18,7 +24,14 @@ import jakarta.validation.ConstraintViolationException;
 public class GroupServiceIMPL implements GroupService {
     
     @Autowired
-    private groupRepository groupRepo;
+    private groupRepository groupRepo; 
+
+    @Autowired
+    private travelerRepository travRepo; 
+
+    @Autowired
+    private TravelerService travService; 
+
 
     /* Create a group, call Exception when its name field already exists */
     @Override // this function might be more useful for traveler
@@ -26,8 +39,8 @@ public class GroupServiceIMPL implements GroupService {
         Optional<Group> groupOptional = groupRepo.findByGroup(group.getName()); 
         if(groupOptional.isPresent()) {
             throw new GroupCollectionException(GroupCollectionException.GroupAlreadyExists());
-        } else {
-            groupRepo.save(group);
+        } else { 
+            groupRepo.save(group); 
         }
     } 
 
@@ -38,7 +51,7 @@ public class GroupServiceIMPL implements GroupService {
             return groups;
         } else {
             return new ArrayList<Group>();
-        }
+        } 
     }
 
     @Override
@@ -88,4 +101,25 @@ public class GroupServiceIMPL implements GroupService {
     public List<Traveler> findAllTravelers(Group group) {
         return group.getTravelers();
     }
+
+    @Override
+    public List<Traveler> findTravelersFromGroup(Group group, List<Traveler> travelers) throws travelerCollectionException {
+        List<Traveler> groupTravelers = findAllTravelers(group);
+        for (Traveler traveler : travelers) {
+            if (!groupTravelers.contains(traveler)) {
+                throw new travelerCollectionException(travelerCollectionException.TravelerNotInGroup(group.getId(), traveler.getId()));
+            } 
+        }
+        return groupTravelers;
+    }
+
+    @Override
+    public Traveler findSingleTravelerFromGroup(Group group, String travId) throws travelerCollectionException, GroupCollectionException {
+        Traveler traveler = travService.findSingleTraveler(travId);
+        if(!group.getTravelers().contains(traveler)) {
+            throw new travelerCollectionException(travelerCollectionException.TravelerNotInGroup(travId, group.getId()));
+        }
+        return traveler;
+    }
+
 }

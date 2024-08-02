@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.LightSplit.demo.Exception.travellerCollectionException;
+import com.LightSplit.demo.Exception.travelerCollectionException;
 import com.LightSplit.demo.Model.Group;
 import com.LightSplit.demo.Model.Item;
 import com.LightSplit.demo.Model.Traveler;
@@ -59,7 +59,7 @@ public class travelerController {
             return new ResponseEntity<Traveler>(traveler, HttpStatus.OK);
         } catch(ConstraintViolationException e) {
             return new ResponseEntity<String>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
-        } catch(travellerCollectionException e) {
+        } catch(travelerCollectionException e) {
             return new ResponseEntity<String>(e.getMessage(), HttpStatus.CONFLICT);
         }
     } 
