@@ -9,11 +9,21 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+
+import com.LightSplit.demo.Exception.GroupCollectionException;
+import com.LightSplit.demo.Exception.ItemCollectionException;
+import com.LightSplit.demo.Exception.travelerCollectionException;
+
 import com.LightSplit.demo.Model.Group;
 import com.LightSplit.demo.Model.Item;
 import com.LightSplit.demo.Model.Traveler;
 import com.LightSplit.demo.Repository.groupRepository;
 import com.LightSplit.demo.Repository.itemRepository;
+
+import com.LightSplit.demo.Service.GroupService;
+import com.LightSplit.demo.Service.ItemService;
+
+import jakarta.validation.ConstraintViolationException;
 import com.LightSplit.demo.Repository.travelerRepository;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -31,6 +41,15 @@ public class itemController {
     
     @Autowired
     private itemRepository itemRepo;
+
+    @Autowired 
+    private ItemService itemService;
+
+    @Autowired
+    private groupRepository groupRepo;
+
+    @Autowired 
+    private GroupService groupService;
 
     @Autowired
     private groupRepository groupRepo;
@@ -58,6 +77,49 @@ public class itemController {
             }
     }
 
+
+    @PutMapping("item/{itemId}/group/{groupId}/payment/{cost}/traveler/{payerId}")
+    public ResponseEntity<?> splitCostEqually(@PathVariable String itemId, @PathVariable double cost, @PathVariable String groupId, @PathVariable String payerId, @RequestBody List<Traveler> travelers) {
+        try {
+            Group group = groupService.getSingleGroup(groupId);
+            Item item = itemService.getSingleItem(itemId);
+            List<Traveler> groupTravelers = groupService.findTravelersFromGroup(group, group.getTravelers());
+            Traveler payer = groupService.findSingleTravelerFromGroup(group, payerId);
+            item.setPaymentMap(itemService.splitEqually(cost, groupTravelers, payer));
+            groupRepo.save(group);
+            itemRepo.save(item);
+            
+            return new ResponseEntity<>(group, HttpStatus.OK);
+        } catch(ItemCollectionException | GroupCollectionException | travelerCollectionException e) {
+            return new ResponseEntity<String>(e.getMessage(), HttpStatus.CONFLICT);
+        } 
+    } 
+
+    /* FrontEnd: It will be nice if front end shows the expected amount payed by the last traveler in the group!
+    /* Update balance, paid and shared by who with customized amount */
+    // 1. in the request body, use balance field to save the amount travlers owed. Set it back to 0 after accounted for in the group. 
+    // 1.1 Actually might not need to set to 0. Just don't save them to travRepo at last. 
+    // 1.2 So the balance field in travRepository is like a temp variable for the updated balance 
+    @PutMapping("item/{itemId}/customization/group/{groupId}/payment/{cost}/traveler/{payerId}")
+    public ResponseEntity<?> splitCostCustomized(@PathVariable double cost, @PathVariable String groupId, @PathVariable String itemId, @PathVariable String payerId, @RequestBody List<Traveler> travelers) {
+
+        try {
+            Group group = groupService.getSingleGroup(groupId);
+            Item item = itemService.getSingleItem(itemId);
+            List<Traveler> groupTravelers = groupService.findTravelersFromGroup(group, group.getTravelers());
+            Traveler payer = groupService.findSingleTravelerFromGroup(group, payerId);
+            item.setPaymentMap(itemService.splitCustomized(group, cost, groupTravelers, travelers, payer));
+            groupRepo.save(group);
+            itemRepo.save(item);
+
+            return new ResponseEntity<>(group, HttpStatus.OK);
+            
+        } catch(ConstraintViolationException | ItemCollectionException | GroupCollectionException | travelerCollectionException e) {
+            return new ResponseEntity<String>(e.getMessage(), HttpStatus.CONFLICT);
+        } 
+    }
+    
+    
     // Add item to item list
     @PutMapping("/group/{groupId}/item")
     public ResponseEntity<?> addItemToGroup(@PathVariable String groupId, @RequestBody String itemId) { // Raw text for the request body
