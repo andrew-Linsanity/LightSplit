@@ -169,6 +169,4 @@ public class travelerController {
         return new ResponseEntity<Item>(item, HttpStatus.OK);
     }
 
-    // delete traveler from item
-    
 }

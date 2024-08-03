@@ -95,7 +95,7 @@ public class groupController {
     }
 
     @DeleteMapping("/group/{groupId}")
-    public ResponseEntity<?> deleteById(@PathVariable("groupId") String groupId) {
+    public ResponseEntity<?> deleteById(@PathVariable String groupId) {
         try {
             groupService.deleteById(groupId);
             return new ResponseEntity<String>("Successfully delete id: " + groupId, HttpStatus.OK);
@@ -112,4 +112,23 @@ public class groupController {
         return new ResponseEntity<String>("Successfully deleted every group!", HttpStatus.OK);
     }
 
+    // PutMapping: finalize minimum transactions, ending the trip
+    // 1. Begin with the list of travelers's balance
+    // 2. Map the most negative to the most positive and canceel each other, then the second most positive.
+    // 2.1 If one of them becomes 0, move on to the second highest.
+    // 3. Structure: two arrays, one with positive balance trav, the other negative, sorted(ZIG ZAG)
+    // 4. Should return a list of "final transactions" objects
+    // 4.1 here we create methods of
+
+    // TODO: test endpoint 
+    @PutMapping("group/{groupId}/finalCost")
+    public ResponseEntity<?> findMinimumTransactions(@PathVariable String groupId) {
+        try {
+            Group group = groupRepo.findById(groupId).get();
+            return new ResponseEntity<>(groupService.finalizeCost(group), HttpStatus.OK);
+
+        } catch(Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+    }
 }
