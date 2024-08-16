@@ -1,8 +1,6 @@
 package com.LightSplit.demo.Controller;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,16 +14,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.LightSplit.demo.Exception.GroupCollectionException;
-import com.LightSplit.demo.Exception.ItemCollectionException;
-import com.LightSplit.demo.Exception.travelerCollectionException;
 import com.LightSplit.demo.Model.Group;
-import com.LightSplit.demo.Model.Item;
-import com.LightSplit.demo.Model.Traveler;
 import com.LightSplit.demo.Repository.groupRepository;
-import com.LightSplit.demo.Repository.itemRepository;
-import com.LightSplit.demo.Repository.travelerRepository;
 import com.LightSplit.demo.Service.GroupService;
-import com.LightSplit.demo.Service.ItemService;
 
 import jakarta.validation.ConstraintViolationException;
 
@@ -36,16 +27,8 @@ public class groupController {
     private groupRepository groupRepo;
 
     @Autowired
-    private travelerRepository travRepo;
-
-    @Autowired
-    private itemRepository itemRepo;
-
-    @Autowired
     private GroupService groupService;
 
-    @Autowired
-    private ItemService itemService;
 
 
     /* Create a group of travelers */
@@ -72,7 +55,7 @@ public class groupController {
         }
     }
 
-    /* Get a single group */
+    /* Get a single group */ 
     @GetMapping("/group/{id}")
     public ResponseEntity<?> getSingleGroup(@PathVariable("id") String id) {
         try {
@@ -120,7 +103,6 @@ public class groupController {
     // 4. Should return a list of "final transactions" objects
     // 4.1 here we create methods of
 
-    // TODO: test endpoint 
     @PutMapping("group/{groupId}/finalCost")
     public ResponseEntity<?> findMinimumTransactions(@PathVariable String groupId) {
         try {

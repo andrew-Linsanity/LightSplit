@@ -1,8 +1,8 @@
 package com.LightSplit.demo.Exception;
 
-public class travelerCollectionException extends Exception {
+public class TravelerCollectionException extends Exception {
 
-    public travelerCollectionException(String message) {
+    public TravelerCollectionException(String message) {
         super(message); // constructs an exception with specified and detailed messages
     }
 
@@ -17,4 +17,8 @@ public class travelerCollectionException extends Exception {
     public static String TravelerNotInGroup(String travId, String groupId) {
         return "Traveler with id: " + travId + " is not in group: " + groupId;
     }
+
+    public static String TravelerAlreadyInItem(String travId, String itemId) {
+        return "Traveler " + travId + " is not in the item: " + itemId + ".";
+    } 
 }

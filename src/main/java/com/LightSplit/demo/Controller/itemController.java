@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.LightSplit.demo.Exception.GroupCollectionException;
 import com.LightSplit.demo.Exception.ItemCollectionException;
-import com.LightSplit.demo.Exception.travelerCollectionException;
+import com.LightSplit.demo.Exception.TravelerCollectionException;
 
 import com.LightSplit.demo.Model.Group;
 import com.LightSplit.demo.Model.Item;
@@ -52,9 +52,6 @@ public class itemController {
     private GroupService groupService;
 
     @Autowired
-    private groupRepository groupRepo;
-
-    @Autowired
     private travelerRepository travRepo;
     
     @PostMapping("/item") 
@@ -69,12 +66,11 @@ public class itemController {
     
     @GetMapping("/item/{itemId}")
     public ResponseEntity<?> getItem(@PathVariable String itemId) {
-            Optional<Item> itemOptional = itemRepo.findById(itemId);
-            if(itemOptional.isPresent()) {
-                return new ResponseEntity<>(itemOptional.get(), HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>("Item id: " + itemId  + " not Found.", HttpStatus.NOT_FOUND);
-            }
+        try {
+            return new ResponseEntity<>(itemService.getSingleItem(itemId), HttpStatus.OK);
+        } catch ( ItemCollectionException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
     }
 
 
@@ -90,7 +86,7 @@ public class itemController {
             itemRepo.save(item);
             
             return new ResponseEntity<>(group, HttpStatus.OK);
-        } catch(ItemCollectionException | GroupCollectionException | travelerCollectionException e) {
+        } catch(ItemCollectionException | GroupCollectionException | TravelerCollectionException e) {
             return new ResponseEntity<String>(e.getMessage(), HttpStatus.CONFLICT);
         } 
     } 
@@ -114,7 +110,7 @@ public class itemController {
 
             return new ResponseEntity<>(group, HttpStatus.OK);
             
-        } catch(ConstraintViolationException | ItemCollectionException | GroupCollectionException | travelerCollectionException e) {
+        } catch(ConstraintViolationException | ItemCollectionException | GroupCollectionException | TravelerCollectionException e) {
             return new ResponseEntity<String>(e.getMessage(), HttpStatus.CONFLICT);
         } 
     }

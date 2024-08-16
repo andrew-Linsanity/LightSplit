@@ -34,7 +34,7 @@ public class Item {
     
     private List<Traveler> travelers;
 
-    private HashMap<String, Double> paymentMap;
+    private HashMap<String, Double> paymentMap = new HashMap<>();
 
     @CreatedDate
     private LocalDateTime payedAt;

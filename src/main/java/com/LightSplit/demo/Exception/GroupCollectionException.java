@@ -1,8 +1,5 @@
 package com.LightSplit.demo.Exception;
 
-import com.LightSplit.demo.Model.Group;
-import com.LightSplit.demo.Model.Traveler;
-
 public class GroupCollectionException extends Exception {
 
     public GroupCollectionException(String message) {
