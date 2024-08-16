@@ -13,5 +13,4 @@ public class ItemCollectionException extends Exception {
     public static String SumNotAddUp() {
         return "Total shared amounts don't add up with the cost.";
     }
-
 }
