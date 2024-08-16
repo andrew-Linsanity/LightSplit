@@ -7,11 +7,13 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.LightSplit.demo.Exception.GroupCollectionException;
 import com.LightSplit.demo.Exception.ItemCollectionException;
 import com.LightSplit.demo.Exception.TravelerCollectionException;
 import com.LightSplit.demo.Model.Group;
 import com.LightSplit.demo.Model.Item;
 import com.LightSplit.demo.Model.Traveler;
+import com.LightSplit.demo.Repository.groupRepository;
 import com.LightSplit.demo.Repository.itemRepository;
 
 import jakarta.validation.ConstraintViolationException; 
@@ -20,7 +22,21 @@ import jakarta.validation.ConstraintViolationException;
 public class ItemServiceIMPL implements ItemService {
 
     @Autowired
-    private itemRepository itemRepo;
+    private itemRepository itemRepo; 
+
+    @Autowired
+    private groupRepository groupRepo;
+
+    @Autowired
+    private GroupService groupService;
+
+    @Autowired TravelerService travService;
+
+    @Autowired
+    public Item saveItem(Item item) {
+        itemRepo.save(item);
+        return item;
+    }
 
     @Override
     public Item getSingleItem(String itemId) throws ItemCollectionException {
@@ -31,6 +47,15 @@ public class ItemServiceIMPL implements ItemService {
         } else {
             throw new ItemCollectionException(ItemCollectionException.NotFoundException(itemId));
         }
+    }
+
+    @Override
+    public Group addItemToGroup(String itemId, String groupId) throws GroupCollectionException, ItemCollectionException {
+        Group group = groupService.getSingleGroup(groupId);
+        Item item = getSingleItem(itemId);
+        group.getItems().add(item);
+        groupRepo.save(group); 
+        return group;
     }
 
     @Override
@@ -78,5 +103,32 @@ public class ItemServiceIMPL implements ItemService {
         } 
 
         return travCostMap;
+    } 
+
+    @Override
+    public Group deleteItemFromGroup(String itemId, String groupId) throws GroupCollectionException, ItemCollectionException, TravelerCollectionException {
+        Group group = groupService.getSingleGroup(groupId);
+        List<Item> items = group.getItems(); 
+        Item tarItem = getSingleItem(itemId); //uncheck 
+        for(Item item : items) { // find target item in the group 
+            if(item.equals(tarItem)) {
+                HashMap<String, Double> map = item.getPaymentMap();
+                for(HashMap.Entry<String,Double> set : map.entrySet()) {
+                    String tempId = set.getKey();
+                    Traveler targetTrav = travService.findSingleTraveler(tempId);
+                    Double tempBal = set.getValue();
+                    for(Traveler groupTrav : group.getTravelers()) { // update balance of the grouptravelers
+                        if(groupTrav.equals(targetTrav)) {
+                            groupTrav.setBalance(groupTrav.getBalance() + tempBal);
+                            break;
+                        }
+                    }
+                };
+                break;
+            }
+        } 
+        items.remove(tarItem);
+        groupRepo.save(group);
+        return group;
     }
 }

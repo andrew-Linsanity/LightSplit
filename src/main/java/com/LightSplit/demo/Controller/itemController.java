@@ -50,15 +50,11 @@ public class itemController {
 
     @Autowired 
     private GroupService groupService;
-
-    @Autowired
-    private travelerRepository travRepo;
     
     @PostMapping("/item") 
     public ResponseEntity<?> createItem(@RequestBody Item item) {
         try {
-            itemRepo.save(item);
-            return new ResponseEntity<>(item, HttpStatus.OK);
+            return new ResponseEntity<>(itemService.saveItem(item), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -113,21 +109,17 @@ public class itemController {
         } catch(ConstraintViolationException | ItemCollectionException | GroupCollectionException | TravelerCollectionException e) {
             return new ResponseEntity<String>(e.getMessage(), HttpStatus.CONFLICT);
         } 
-    }
+    }  
     
     
     // Add item to item list
     @PutMapping("/group/{groupId}/item")
     public ResponseEntity<?> addItemToGroup(@PathVariable String groupId, @RequestBody String itemId) { // Raw text for the request body
-        Optional<Group> groupOptional = groupRepo.findById(groupId);
-        Optional<Item> itemOptional = itemRepo.findById(itemId);
-        if(!groupOptional.isPresent()) return new ResponseEntity<>("Group with id: " + groupId + " not found.", HttpStatus.NOT_FOUND);
-        if(!itemOptional.isPresent()) return new ResponseEntity<>("Item with id: " + itemId + " not found.", HttpStatus.NOT_FOUND);
-        Group group = groupOptional.get();
-        Item item = itemOptional.get();
-        group.getItems().add(item);
-        groupRepo.save(group); 
-        return new ResponseEntity<Group>(group, HttpStatus.OK); 
+        try {
+            return new ResponseEntity<Group>(itemService.addItemToGroup(itemId, groupId), HttpStatus.OK); 
+        } catch(ItemCollectionException | GroupCollectionException e) {
+            return new ResponseEntity<String>(e.getMessage(), HttpStatus.CONFLICT);
+        } 
     }
 
     /* delete the an item */
@@ -137,31 +129,11 @@ public class itemController {
 
     @DeleteMapping("group/{groupId}/item/{itemId}") 
     public ResponseEntity<?> deleteItemFromGroup(@PathVariable String itemId, @PathVariable String groupId) {
-        Optional<Group> groupOptional = groupRepo.findById(groupId);
-        if(!groupOptional.isPresent()) return new ResponseEntity<>("Group with id: " + groupId + " not found.", HttpStatus.NOT_FOUND);
-        Group group = groupOptional.get(); 
-        List<Item> items = group.getItems(); 
-        Item tarItem = itemRepo.findById(itemId).get(); //uncheck 
-        for(Item item : items) { // find target item in the group 
-            if(item.equals(tarItem)) {
-                HashMap<String, Double> map = item.getPaymentMap();
-                for(HashMap.Entry<String,Double> set : map.entrySet()) {
-                    String tempId = set.getKey();
-                    Traveler targetTrav = travRepo.findById(tempId).get();
-                    Double tempBal = set.getValue();
-                    for(Traveler groupTrav : group.getTravelers()) { // update balance of the grouptravelers
-                        if(groupTrav.equals(targetTrav)) {
-                            groupTrav.setBalance(groupTrav.getBalance() + tempBal);
-                            break;
-                        }
-                    }
-                };
-                break;
-            }
+        try {
+            return new ResponseEntity<>(itemService.deleteItemFromGroup(itemId, groupId), HttpStatus.OK);
+        } catch(ConstraintViolationException | ItemCollectionException | GroupCollectionException | TravelerCollectionException e) { 
+            return new ResponseEntity<String>(e.getMessage(), HttpStatus.CONFLICT); 
         } 
-        items.remove(tarItem);
-        groupRepo.save(group);
-        return new ResponseEntity<>(group, HttpStatus.OK);
     }
 }
 
