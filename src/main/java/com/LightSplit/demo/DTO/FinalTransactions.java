@@ -1,4 +1,6 @@
-package com.LightSplit.demo.Model;
+package com.LightSplit.demo.DTO;
+
+import com.LightSplit.demo.Model.Traveler;
 
 import lombok.Getter;
 

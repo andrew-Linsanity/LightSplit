@@ -49,6 +49,7 @@ public class ItemServiceIMPL implements ItemService {
         }
     }
 
+    // TODO: Refactor needed
     @Override
     public Group addItemToGroup(String itemId, String groupId) throws GroupCollectionException, ItemCollectionException {
         Group group = groupService.getSingleGroup(groupId);
@@ -76,6 +77,7 @@ public class ItemServiceIMPL implements ItemService {
         return travCostMap;
     }
 
+    // TODO: Refactor needed
     @Override
     public HashMap<String, Double> splitCustomized(Group group, double cost, List<Traveler> groupTravelers, List<Traveler> travelers, Traveler payer) throws ConstraintViolationException, TravelerCollectionException, ItemCollectionException {
 

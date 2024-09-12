@@ -20,9 +20,11 @@ public interface TravelerService {
 
     public Traveler updateTraveler(String id, Traveler traveler) throws TravelerCollectionException;
 
-    public Traveler deleteTraveler(String id) throws TravelerCollectionException; 
+    public Traveler deleteTraveler(String id) throws TravelerCollectionException;
 
-    public Group addSingleTravelerToGroup(String groupId, String travelerId) throws GroupCollectionException, TravelerCollectionException; 
+    public Group addSingleTravelerToGroup(String groupId, String travelerId)
+            throws GroupCollectionException, TravelerCollectionException;
 
-    public Item addTravelerToItem(String itemId, String travelerId) throws TravelerCollectionException, ItemCollectionException;
+    public Item addTravelerToItem(String itemId, String travelerId)
+            throws TravelerCollectionException, ItemCollectionException;
 }
