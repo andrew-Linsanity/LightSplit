@@ -33,6 +33,7 @@ public class ItemServiceIMPL implements ItemService {
         }
     }
 
+    // TODO: Refactor needed
     @Override
     public HashMap<String,Double> splitEqually(double cost, List<Traveler> groupTravelers, Traveler payer) {
         double splitCost = cost / groupTravelers.size();
@@ -51,6 +52,7 @@ public class ItemServiceIMPL implements ItemService {
         return travCostMap;
     }
 
+    // TODO: Refactor needed
     @Override
     public HashMap<String, Double> splitCustomized(Group group, double cost, List<Traveler> groupTravelers, List<Traveler> travelers, Traveler payer) throws ConstraintViolationException, TravelerCollectionException, ItemCollectionException {
 

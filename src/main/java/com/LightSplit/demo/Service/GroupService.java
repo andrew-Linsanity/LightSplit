@@ -4,12 +4,11 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.LightSplit.demo.DTO.FinalTransactions;
+import com.LightSplit.demo.DTO.TravelerDTO;
 import com.LightSplit.demo.Exception.GroupCollectionException;
 
 import com.LightSplit.demo.Exception.TravelerCollectionException;
-
-import com.LightSplit.demo.Model.FinalTransactions;
-
 import com.LightSplit.demo.Model.Group;
 import com.LightSplit.demo.Model.Traveler;
 
@@ -30,11 +29,11 @@ public interface GroupService {
 
     public void deleteAllGroups();
 
-    public List<Traveler> findAllTravelers(Group group) throws GroupCollectionException, TravelerCollectionException;
+    public List<TravelerDTO> findAllTravelers(Group group) throws GroupCollectionException, TravelerCollectionException;
 
-    public List<Traveler> findTravelersFromGroup(Group group, List<Traveler> travelers) throws TravelerCollectionException, GroupCollectionException;
+    public List<TravelerDTO> findTravelersFromGroup(Group group, List<TravelerDTO> travelers) throws TravelerCollectionException, GroupCollectionException;
 
-    public Traveler findSingleTravelerFromGroup(Group group, String travId) throws TravelerCollectionException, GroupCollectionException; 
+    public TravelerDTO findSingleTravelerFromGroup(Group group, String travId) throws TravelerCollectionException, GroupCollectionException; 
 
     public List<FinalTransactions> finalizeCost(Group group); 
 } 

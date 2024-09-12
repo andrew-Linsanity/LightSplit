@@ -10,6 +10,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.LightSplit.demo.DTO.TravelerDTO;
+
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -32,7 +34,7 @@ public class Item {
     @NotNull
     private Double price;
     
-    private List<Traveler> travelers;
+    private List<TravelerDTO> travelers;
 
     private HashMap<String, Double> paymentMap = new HashMap<>();
 

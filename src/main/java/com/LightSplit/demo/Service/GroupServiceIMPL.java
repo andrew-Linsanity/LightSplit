@@ -7,14 +7,15 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.LightSplit.demo.DTO.FinalTransactions;
+import com.LightSplit.demo.DTO.TravelerDTO;
 import com.LightSplit.demo.Exception.GroupCollectionException;
 
 import com.LightSplit.demo.Exception.TravelerCollectionException;
-
-import com.LightSplit.demo.Model.FinalTransactions;
-
 import com.LightSplit.demo.Model.Group;
 import com.LightSplit.demo.Model.Traveler;
+import com.LightSplit.demo.Model.UserEntity;
+import com.LightSplit.demo.Repository.UserRepository;
 import com.LightSplit.demo.Repository.groupRepository;
 import com.LightSplit.demo.Repository.travelerRepository;
 
@@ -28,6 +29,9 @@ public class GroupServiceIMPL implements GroupService {
 
     @Autowired
     private travelerRepository travRepo;
+
+    @Autowired 
+    private UserRepository userRepo;
 
     /* Create a group, call Exception when its name field already exists */
     @Override // this function might be more useful for traveler
@@ -94,13 +98,21 @@ public class GroupServiceIMPL implements GroupService {
     }
 
     @Override
-    public List<Traveler> findAllTravelers(Group group) {
+    public List<TravelerDTO> findAllTravelers(Group group) {
         return group.getTravelers();
+    } 
+
+    public Group addUserToGroup(String username, Group group) {
+        UserEntity user = userRepo.findByUsername(username).get(); 
+        TravelerDTO traveler = new TravelerDTO(username);
+        group.setTravelers(group.getTravelers().add(traveler));
+
+        
     }
 
     @Override
-    public List<Traveler> findTravelersFromGroup(Group group, List<Traveler> travelers) throws TravelerCollectionException {
-        List<Traveler> groupTravelers = findAllTravelers(group);
+    public List<Traveler> findTravelersFromGroup(Group group, List<Traveler> travelers) throws TravelerCollectionException { 
+        List<Traveler> groupTravelers = findAllTravelers(group); 
         for (Traveler traveler : travelers) {
             if (!groupTravelers.contains(traveler)) {
                 throw new TravelerCollectionException(TravelerCollectionException.TravelerNotInGroup(group.getId(), traveler.getId()));
@@ -109,6 +121,7 @@ public class GroupServiceIMPL implements GroupService {
         return groupTravelers;
     } 
 
+    // TODO: refactor so we look for traveler in the group
     @Override
     public Traveler findSingleTravelerFromGroup(Group group, String travId) throws TravelerCollectionException, GroupCollectionException {
         Traveler traveler = travRepo.findById(travId).get();
@@ -118,6 +131,7 @@ public class GroupServiceIMPL implements GroupService {
         return traveler;
     }
 
+    // TODO: TravelerDTO refactor
     public List<FinalTransactions> finalizeCost(Group group) {
         List<Traveler> travelers = group.getTravelers();
         ArrayList<Traveler> posTravs = new ArrayList<>();
