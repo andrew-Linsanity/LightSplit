@@ -1,8 +1,6 @@
 package com.LightSplit.demo.Controller;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,7 +14,7 @@ import com.LightSplit.demo.Exception.TravelerCollectionException;
 
 import com.LightSplit.demo.Model.Group;
 import com.LightSplit.demo.Model.Item;
-import com.LightSplit.demo.Model.Traveler;
+import com.LightSplit.demo.DTO.TravelerDTO; 
 import com.LightSplit.demo.Repository.groupRepository;
 import com.LightSplit.demo.Repository.itemRepository;
 
@@ -24,7 +22,6 @@ import com.LightSplit.demo.Service.GroupService;
 import com.LightSplit.demo.Service.ItemService;
 
 import jakarta.validation.ConstraintViolationException;
-import com.LightSplit.demo.Repository.travelerRepository;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -70,13 +67,13 @@ public class itemController {
     }
 
 
-    @PutMapping("item/{itemId}/group/{groupId}/payment/{cost}/traveler/{payerId}")
-    public ResponseEntity<?> splitCostEqually(@PathVariable String itemId, @PathVariable double cost, @PathVariable String groupId, @PathVariable String payerId, @RequestBody List<Traveler> travelers) {
+    @PutMapping("item/{itemId}/group/{groupId}/payment/{cost}/traveler/{payerUsername}")
+    public ResponseEntity<?> splitCostEqually(@PathVariable String itemId, @PathVariable double cost, @PathVariable String groupId, @PathVariable String payerUsername, @RequestBody List<TravelerDTO> travelers) {
         try {
             Group group = groupService.getSingleGroup(groupId);
             Item item = itemService.getSingleItem(itemId);
-            List<Traveler> groupTravelers = groupService.findTravelersFromGroup(group, group.getTravelers());
-            Traveler payer = groupService.findSingleTravelerFromGroup(group, payerId);
+            List<TravelerDTO> groupTravelers = groupService.findTravelersFromGroup(group, group.getTravelers());
+            TravelerDTO payer = groupService.findSingleTravelerFromGroup(group, payerUsername);
             item.setPaymentMap(itemService.splitEqually(cost, groupTravelers, payer));
             groupRepo.save(group);
             itemRepo.save(item);
@@ -92,14 +89,14 @@ public class itemController {
     // 1. in the request body, use balance field to save the amount travlers owed. Set it back to 0 after accounted for in the group. 
     // 1.1 Actually might not need to set to 0. Just don't save them to travRepo at last. 
     // 1.2 So the balance field in travRepository is like a temp variable for the updated balance 
-    @PutMapping("item/{itemId}/customization/group/{groupId}/payment/{cost}/traveler/{payerId}")
-    public ResponseEntity<?> splitCostCustomized(@PathVariable double cost, @PathVariable String groupId, @PathVariable String itemId, @PathVariable String payerId, @RequestBody List<Traveler> travelers) {
+    @PutMapping("item/{itemId}/customization/group/{groupId}/payment/{cost}/traveler/{payerUsername}")
+    public ResponseEntity<?> splitCostCustomized(@PathVariable double cost, @PathVariable String groupId, @PathVariable String itemId, @PathVariable String payerUsername, @RequestBody List<TravelerDTO> travelers) {
 
         try {
             Group group = groupService.getSingleGroup(groupId);
             Item item = itemService.getSingleItem(itemId);
-            List<Traveler> groupTravelers = groupService.findTravelersFromGroup(group, group.getTravelers());
-            Traveler payer = groupService.findSingleTravelerFromGroup(group, payerId);
+            List<TravelerDTO> groupTravelers = groupService.findTravelersFromGroup(group, group.getTravelers());
+            TravelerDTO payer = groupService.findSingleTravelerFromGroup(group, payerUsername);
             item.setPaymentMap(itemService.splitCustomized(group, cost, groupTravelers, travelers, payer));
             groupRepo.save(group);
             itemRepo.save(item);

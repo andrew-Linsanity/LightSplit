@@ -16,7 +16,6 @@ import com.LightSplit.demo.Exception.GroupCollectionException;
 import com.LightSplit.demo.Model.Group;
 import com.LightSplit.demo.Repository.groupRepository;
 import com.LightSplit.demo.Service.GroupService;
-import com.LightSplit.demo.DTO.TravelerDTO;
 
 import jakarta.validation.ConstraintViolationException;
 
@@ -79,11 +78,11 @@ public class groupController {
     @DeleteMapping("/{groupId}")
     public ResponseEntity<?> deleteById(@PathVariable String groupId) {
         try {
-            groupService.deleteById(groupId);
-            return new ResponseEntity<String>("Successfully delete id: " + groupId, HttpStatus.OK);
+            groupService.deleteById(groupId); 
+            return new ResponseEntity<String>("Successfully delete id: " + groupId, HttpStatus.OK); 
         } 
         catch(GroupCollectionException e) { 
-            return new ResponseEntity<String>(e.getMessage(), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<String>(e.getMessage(), HttpStatus.NOT_FOUND); 
         } 
     } 
 
@@ -105,20 +104,23 @@ public class groupController {
     @PutMapping("/{groupId}/finalCost")
     public ResponseEntity<?> findMinimumTransactions(@PathVariable String groupId) {
         try {
-            Group group = groupRepo.findById(groupId).get();
-            return new ResponseEntity<>(groupService.finalizeCost(group), HttpStatus.OK);
+            Group group = groupRepo.findById(groupId).get(); 
+            return new ResponseEntity<>(groupService.finalizeCost(group), HttpStatus.OK); 
 
         } catch(Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
     }
 
+    // TODO: create specific exception class for UserEntity
     @PostMapping("/{groupId}/traveler")
     public ResponseEntity<?> addTravelerToGroup(String username, @PathVariable String groupId) {
         try {
             Group group = groupRepo.findById(groupId).get();
-            
-            return new ResponseEntity<>(groupService.addUserToGroup(username), HttpStatus.OK);
+            return new ResponseEntity<>(groupService.addUserToGroup(username, group), HttpStatus.OK);
+
+        } catch(Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
     }
 }

@@ -10,15 +10,15 @@ public class TravelerCollectionException extends Exception {
         return "NickName must contains at least one letter."; 
     } 
 
-    public static String TravelerNotFound(String id) {
-        return "Traveler with id: " + id + " is not found.";
+    public static String TravelerNotInGroup(String groupId, String username) { 
+        return "Traveler " + username + " is not in group: " + groupId; 
     } 
 
-    public static String TravelerNotInGroup(String travId, String groupId) {
-        return "Traveler with id: " + travId + " is not in group: " + groupId;
+    public static String TravelerNotInItem(String itemId, String username) { 
+        return "Traveler " + username + " is not in item: " + itemId; 
     }
 
-    public static String TravelerAlreadyInItem(String travId, String itemId) {
-        return "Traveler " + travId + " is not in the item: " + itemId + ".";
+    public static String TravelerAlreadyInItem(String username, String itemId) {
+        return "Traveler " + username + " is not in the item: " + itemId + ".";
     } 
 }

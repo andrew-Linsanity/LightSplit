@@ -10,7 +10,6 @@ import com.LightSplit.demo.Exception.GroupCollectionException;
 
 import com.LightSplit.demo.Exception.TravelerCollectionException;
 import com.LightSplit.demo.Model.Group;
-import com.LightSplit.demo.Model.Traveler;
 
 import jakarta.validation.ConstraintViolationException;
 
@@ -29,11 +28,13 @@ public interface GroupService {
 
     public void deleteAllGroups();
 
+    public Group addUserToGroup(String username, Group group);
+
     public List<TravelerDTO> findAllTravelers(Group group) throws GroupCollectionException, TravelerCollectionException;
 
     public List<TravelerDTO> findTravelersFromGroup(Group group, List<TravelerDTO> travelers) throws TravelerCollectionException, GroupCollectionException;
 
-    public TravelerDTO findSingleTravelerFromGroup(Group group, String travId) throws TravelerCollectionException, GroupCollectionException; 
+    public TravelerDTO findSingleTravelerFromGroup(Group group, String username) throws TravelerCollectionException, GroupCollectionException; 
 
     public List<FinalTransactions> finalizeCost(Group group); 
 } 

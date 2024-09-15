@@ -13,11 +13,7 @@ import com.LightSplit.demo.Exception.GroupCollectionException;
 
 import com.LightSplit.demo.Exception.TravelerCollectionException;
 import com.LightSplit.demo.Model.Group;
-import com.LightSplit.demo.Model.Traveler;
-import com.LightSplit.demo.Model.UserEntity;
-import com.LightSplit.demo.Repository.UserRepository;
 import com.LightSplit.demo.Repository.groupRepository;
-import com.LightSplit.demo.Repository.travelerRepository;
 
 import jakarta.validation.ConstraintViolationException;
 
@@ -27,13 +23,7 @@ public class GroupServiceIMPL implements GroupService {
     @Autowired
     private groupRepository groupRepo; 
 
-    @Autowired
-    private travelerRepository travRepo;
-
-    @Autowired 
-    private UserRepository userRepo;
-
-    /* Create a group, call Exception when its name field already exists */
+    /* Create a group, call Exception when its name field already exists */ 
     @Override // this function might be more useful for traveler
     public void createGroup(Group group) throws ConstraintViolationException, GroupCollectionException {
         Optional<Group> groupOptional = groupRepo.findByGroup(group.getName()); 
@@ -69,8 +59,8 @@ public class GroupServiceIMPL implements GroupService {
     @Override
     public Group updateGroup(String groupId, Group group) throws GroupCollectionException {
         Optional<Group> groupOptional = groupRepo.findById(groupId);
-        if(groupOptional.isPresent()) {
-            Group groupToSave = groupOptional.get();
+        if(groupOptional.isPresent()) { 
+            Group groupToSave = groupOptional.get(); 
             groupToSave.setDescription(group.getDescription() == null ? groupToSave.getDescription() : group.getDescription());
             groupToSave.setName(group.getName() == null ? groupToSave.getName() : groupToSave.getName());
             groupToSave.setTravelers(group.getTravelers() == null ? groupToSave.getTravelers() : group.getTravelers());
@@ -102,43 +92,44 @@ public class GroupServiceIMPL implements GroupService {
         return group.getTravelers();
     } 
 
+    @Override
     public Group addUserToGroup(String username, Group group) {
-        UserEntity user = userRepo.findByUsername(username).get(); 
         TravelerDTO traveler = new TravelerDTO(username);
-        group.setTravelers(group.getTravelers().add(traveler));
-
-        
+        group.getTravelers().add(traveler);
+        groupRepo.save(group);  
+        return group;
     }
 
     @Override
-    public List<Traveler> findTravelersFromGroup(Group group, List<Traveler> travelers) throws TravelerCollectionException { 
-        List<Traveler> groupTravelers = findAllTravelers(group); 
-        for (Traveler traveler : travelers) {
+    public List<TravelerDTO> findTravelersFromGroup(Group group, List<TravelerDTO> travelers) throws TravelerCollectionException { 
+        List<TravelerDTO> groupTravelers = findAllTravelers(group); 
+        for (TravelerDTO traveler : travelers) {
             if (!groupTravelers.contains(traveler)) {
-                throw new TravelerCollectionException(TravelerCollectionException.TravelerNotInGroup(group.getId(), traveler.getId()));
+                throw new TravelerCollectionException(TravelerCollectionException.TravelerNotInGroup(group.getId(), traveler.getUsername()));
             } 
         }
         return groupTravelers;
     } 
 
-    // TODO: refactor so we look for traveler in the group
     @Override
-    public Traveler findSingleTravelerFromGroup(Group group, String travId) throws TravelerCollectionException, GroupCollectionException {
-        Traveler traveler = travRepo.findById(travId).get();
-        if(!group.getTravelers().contains(traveler)) {
-            throw new TravelerCollectionException(TravelerCollectionException.TravelerNotInGroup(travId, group.getId()));
+    public TravelerDTO findSingleTravelerFromGroup(Group group, String username) throws TravelerCollectionException, GroupCollectionException {
+        List<TravelerDTO> groupTravelers = group.getTravelers(); 
+
+        for(TravelerDTO trav : groupTravelers) {
+            if(trav.getUsername().equals(username)) {
+                return trav;
+            }
         }
-        return traveler;
+        throw new TravelerCollectionException(TravelerCollectionException.TravelerNotInGroup(username, group.getId()));
     }
 
-    // TODO: TravelerDTO refactor
     public List<FinalTransactions> finalizeCost(Group group) {
-        List<Traveler> travelers = group.getTravelers();
-        ArrayList<Traveler> posTravs = new ArrayList<>();
-        ArrayList<Traveler> negTravs = new ArrayList<>();
+        List<TravelerDTO> travelers = group.getTravelers();
+        ArrayList<TravelerDTO> posTravs = new ArrayList<>();
+        ArrayList<TravelerDTO> negTravs = new ArrayList<>();
         ArrayList<FinalTransactions> finalTransactList = new ArrayList<>();
         
-        for(Traveler trav : travelers) {
+        for(TravelerDTO trav : travelers) {
             if(trav.getBalance() < 0) {
                 negTravs.add(trav);
             } else if(trav.getBalance() > 0){
@@ -146,17 +137,17 @@ public class GroupServiceIMPL implements GroupService {
             }
         }
   
-        for(Traveler negTrav : negTravs) {
+        for(TravelerDTO negTrav : negTravs) {
             boolean containsMatch = false;
-            for(Traveler posTrav : posTravs) {
-                if (negTrav.getBalance() + posTrav.getBalance() == 0) {
+            for(TravelerDTO posTrav : posTravs) {
+                if (negTrav.getBalance() + posTrav.getBalance() == 0 && negTrav.getBalance() != 0) { 
                     finalTransactList.add( new FinalTransactions(negTrav, posTrav, -negTrav.getBalance()));
                     containsMatch = true;
                 } 
             } 
             if(containsMatch == false) {
                 while(negTrav.getBalance() != 0) {
-                    Traveler curPosTraveler = posTravs.get(0);
+                    TravelerDTO curPosTraveler = posTravs.get(0);
                     if( -negTrav.getBalance() < curPosTraveler.getBalance()) {
                         curPosTraveler.setBalance(curPosTraveler.getBalance() + negTrav.getBalance());
                         negTrav.setBalance(0);
