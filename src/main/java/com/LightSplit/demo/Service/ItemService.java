@@ -10,7 +10,7 @@ import com.LightSplit.demo.Exception.ItemCollectionException;
 import com.LightSplit.demo.Exception.TravelerCollectionException;
 import com.LightSplit.demo.Model.Group;
 import com.LightSplit.demo.Model.Item;
-import com.LightSplit.demo.Model.Traveler;
+import com.LightSplit.demo.DTO.TravelerDTO;
 
 import jakarta.validation.ConstraintViolationException;
 
@@ -21,11 +21,15 @@ public interface ItemService {
 
     public Item getSingleItem(String itemId) throws ItemCollectionException;
 
-    public HashMap<String,Double> splitEqually(double cost, List<Traveler> groupTravelers, Traveler payer);
+    public HashMap<String,Double> splitEqually(double cost, List<TravelerDTO> groupTravelers, TravelerDTO payer);
     
-    public HashMap<String, Double> splitCustomized(Group group, double cost, List<Traveler> groupTravelers, List<Traveler> travelers, Traveler payer) throws ConstraintViolationException, TravelerCollectionException, ItemCollectionException;
+    public HashMap<String, Double> splitCustomized(Group group, double cost, List<TravelerDTO> groupTravelers, List<TravelerDTO> travelers, TravelerDTO payer) throws ConstraintViolationException, TravelerCollectionException, ItemCollectionException; 
+
+    public TravelerDTO findSingleTravelerFromItem(Item item, String username) throws TravelerCollectionException;
 
     public Group addItemToGroup(String itemId, String groupId) throws GroupCollectionException, ItemCollectionException;
     
-    public Group deleteItemFromGroup(String itemId, String groupId) throws GroupCollectionException, ItemCollectionException, TravelerCollectionException;
+    public Group deleteItemFromGroup(String itemId, String groupId) throws GroupCollectionException, ItemCollectionException, TravelerCollectionException; 
+
+    public Item addTravelerToItem(String itemId, String username) throws TravelerCollectionException, ItemCollectionException;
 }

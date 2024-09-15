@@ -10,9 +10,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.LightSplit.demo.DTO.AuthResponseDTO;
@@ -26,7 +26,6 @@ import com.LightSplit.demo.Security.JWTGenerator;
 
 
 @RestController
-@RequestMapping("/api/auth")
 public class AuthController {
 
     @Autowired
@@ -38,13 +37,22 @@ public class AuthController {
     @Autowired
     private RoleRepository roleRepository;
 
-    // deleted filed: passwordEncoder
-
     @Autowired
     private JWTGenerator jwtGenerator;
 
+    // @Autowired
+    // private PasswordEncoder passwordEncoder;
+
+    public AuthController(AuthenticationManager authMan, UserRepository userRepo, RoleRepository roleRepo, JWTGenerator jwtGenerator, PasswordEncoder passwordEncoder) {
+        this.authenticationManager = authMan;
+        this.userRepository = userRepo;
+        this.roleRepository = roleRepo; 
+        // this.passwordEncoder = passwordEncoder;
+        this.jwtGenerator = jwtGenerator;
+    }
+
     /* TODO: implement the logics to become an admin. */ 
-    @PostMapping("/register")
+    @PostMapping("/api/auth/register")
     public ResponseEntity<?> register(@RequestBody RegisterDTO registerDTO) {
         if(userRepository.existsByUsername(registerDTO.getUsername())) {
             return new ResponseEntity<>("Username is taken! ", HttpStatus.BAD_REQUEST);
@@ -66,7 +74,7 @@ public class AuthController {
         return new ResponseEntity<>("User Registered.", HttpStatus.OK);
     }
 
-    @PostMapping("/login")
+    @PostMapping("/api/auth/login")
     public ResponseEntity<AuthResponseDTO> login(@RequestBody LogInDTO loginDTO) {
         Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginDTO.getUsername(), 
