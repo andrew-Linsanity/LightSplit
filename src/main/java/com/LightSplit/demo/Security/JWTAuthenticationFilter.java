@@ -11,6 +11,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.LightSplit.demo.Service.CustomUserDetailsService;
+import com.LightSplit.demo.Service.JwtService;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -25,12 +26,15 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
     @Autowired 
     private CustomUserDetailsService customUserDetailsService;
 
+    @Autowired
+    private JwtService jwtService;
+
     @SuppressWarnings("null")
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         
-        String token = getJWTFromRequest(request); 
+        String token = jwtService.getJWTFromRequest(request); 
         if(StringUtils.hasText(token) && tokenGenerator.validateToken(token)) {
             String username = tokenGenerator.getUsernameFromJWT(token);
 
@@ -41,15 +45,5 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
         } 
         filterChain.doFilter(request, response);
-    }
-    
-    private String getJWTFromRequest(HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization"); 
-
-        if(StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7, bearerToken.length());
-        } 
-
-        return null;
     }
 }
