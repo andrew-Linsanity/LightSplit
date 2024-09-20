@@ -1,9 +1,14 @@
 package com.LightSplit.demo.Service;
 
 import java.util.Base64;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
 
 import javax.crypto.spec.SecretKeySpec;
 
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import com.LightSplit.demo.Security.SecurityConstants;
@@ -14,6 +19,8 @@ import io.jsonwebtoken.Jwts;
 
 @Service
 public class JwtService {
+
+
     public String getUsernameFromJWT(String token) { 
         // Convert secret key string to a byte array
         byte[] keyBytes = Base64.getDecoder().decode(SecurityConstants.JWT_SECRET);
@@ -22,8 +29,8 @@ public class JwtService {
         Claims claims = Jwts.parserBuilder()
             .setSigningKey(key)
             .build()
-            .parseClaimsJws(token)
+            .parseClaimsJws(token)   
             .getBody();
         return claims.getSubject();
-    }
+    } 
 }

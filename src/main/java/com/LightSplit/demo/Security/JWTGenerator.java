@@ -9,7 +9,9 @@ import org.springframework.security.authentication.AuthenticationCredentialsNotF
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import java.security.*;
@@ -20,16 +22,16 @@ public class JWTGenerator {
     public String generateToken(Authentication authentication) {
 
         String username = authentication.getName();
-        Date currentDate = new Date();
-        Date expireDate = new Date(currentDate.getTime() + SecurityConstants.JWT_EXPIRATION);
+        Date currentDate = new Date(System.currentTimeMillis());
+        Date expireDate = new Date(System.currentTimeMillis() + SecurityConstants.JWT_EXPIRATION);
 
-        Key key = Keys.hmacShaKeyFor(SecurityConstants.JWT_SECRET.getBytes());
+        Key key = Keys.hmacShaKeyFor(Base64.getDecoder().decode(SecurityConstants.JWT_SECRET));
 
         String token = Jwts.builder()
             .setSubject(username)
-            .setIssuedAt(new Date())
+            .setIssuedAt(currentDate)
             .setExpiration(expireDate)
-            .signWith(key, SignatureAlgorithm.HS512)
+            .signWith(key, SignatureAlgorithm.HS256)
             .compact();
         
         return token;
@@ -46,8 +48,12 @@ public class JWTGenerator {
                 .parseClaimsJws(token);
 
             return true;
-        } catch (Exception e) {
-            throw new AuthenticationCredentialsNotFoundException("JWT is expired or incorrect, ");
+        } catch (ExpiredJwtException ex) {
+            throw new AuthenticationCredentialsNotFoundException("JWT is expired", ex);
+        } catch (MalformedJwtException ex) {
+            throw new AuthenticationCredentialsNotFoundException("Invalid JWT token", ex);
+        } catch (IllegalArgumentException ex) {
+            throw new AuthenticationCredentialsNotFoundException("JWT claims string is empty", ex);
         }
     }
 }
