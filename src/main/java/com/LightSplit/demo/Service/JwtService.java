@@ -15,8 +15,7 @@ import io.jsonwebtoken.Jwts;
 @Service
 public class JwtService {
 
-
-    public String getUsernameFromJWT(String token) { 
+    public String getUsernameFromJWT(String token) {
         // Convert secret key string to a byte array
         byte[] keyBytes = Base64.getDecoder().decode(SecurityConstants.JWT_SECRET);
         Key key = new SecretKeySpec(keyBytes, 0, keyBytes.length, "HmacSHA256");
