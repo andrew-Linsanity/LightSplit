@@ -1,7 +1,6 @@
 package com.LightSplit.demo.Controller;
 
-import java.util.Collections;
-
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import com.LightSplit.demo.Security.SecurityConstants;
 
 import com.LightSplit.demo.DTO.AuthResponseDTO;
 import com.LightSplit.demo.DTO.LogInDTO;
@@ -48,7 +48,6 @@ public class AuthController {
         this.jwtGenerator = jwtGenerator;
     }
 
-    /* TODO: implement the logics to become an admin. */ 
     @PostMapping("/api/auth/register")
     public ResponseEntity<?> register(@RequestBody RegisterDTO registerDTO) {
         if(userRepository.existsByUsername(registerDTO.getUsername())) {
@@ -64,7 +63,17 @@ public class AuthController {
         user.setPassword(encodedPassword);
 
         Roles roles = roleRepository.findByName("USER").get();
-        user.setRoles(Collections.singletonList(roles));
+
+        List<Roles> userRoles = user.getRoles();
+
+        userRoles.add(roles);
+
+        if(registerDTO.getAdminKey().equals(SecurityConstants.ADMIN_KEY)) {
+            Roles adminRoles = roleRepository.findByName("ADMIN").get();
+            userRoles.add(adminRoles);
+        }
+
+        user.setRoles(userRoles);
 
         userRepository.save(user);
 

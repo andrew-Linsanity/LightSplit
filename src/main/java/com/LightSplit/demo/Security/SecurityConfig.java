@@ -22,7 +22,7 @@ import com.LightSplit.demo.Service.CustomUserDetailsService;
 public class SecurityConfig {
 
     @Autowired
-    private JWTAuthEntryPoint authEntryPoint;
+    private JWTAuthEntryPoint authEntryPoint; 
 
     public SecurityConfig(CustomUserDetailsService userDetailService, JWTAuthEntryPoint jwtAuthEntryPoint) {
         this.authEntryPoint = jwtAuthEntryPoint;
@@ -36,6 +36,8 @@ public class SecurityConfig {
         .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(authorize -> authorize
             .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
+            .requestMatchers(HttpMethod.POST, "/role").hasAuthority("ADMIN")
+            
             .anyRequest().authenticated()
         ) 
         .httpBasic(httpBasic -> httpBasic.disable()); // Disable HTTP Basic if using JWT

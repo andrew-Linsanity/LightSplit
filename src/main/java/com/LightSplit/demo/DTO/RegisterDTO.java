@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class RegisterDTO {
 
-    private String Username;
-    private String Password;
-
+    private String username;
+    private String password;
+    private String adminKey = "default"; // apparently you couldn't have underscore in your field name
 }
