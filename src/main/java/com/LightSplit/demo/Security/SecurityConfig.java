@@ -24,13 +24,9 @@ public class SecurityConfig {
     @Autowired
     private JWTAuthEntryPoint authEntryPoint;
 
-    // @Autowired
-    // private CustomUserDetailsService userDetailsService;
-
     public SecurityConfig(CustomUserDetailsService userDetailService, JWTAuthEntryPoint jwtAuthEntryPoint) {
-        // this.userDetailsService = userDetailService;
         this.authEntryPoint = jwtAuthEntryPoint;
-    }
+    } 
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {

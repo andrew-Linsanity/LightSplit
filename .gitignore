@@ -5,6 +5,8 @@ target/
 !**/src/test/**/target/
 secret.properties
 
+src/main/java/com/LightSplit/demo/Security/SecurityConstants.java
+
 ### STS ###
 .apt_generated
 .classpath

@@ -23,6 +23,7 @@ import com.LightSplit.demo.Model.UserEntity;
 import com.LightSplit.demo.Repository.RoleRepository;
 import com.LightSplit.demo.Repository.UserRepository;
 import com.LightSplit.demo.Security.JWTGenerator;
+import com.LightSplit.demo.Service.JwtService;
 
 
 @RestController
@@ -37,17 +38,13 @@ public class AuthController {
     @Autowired
     private RoleRepository roleRepository;
 
-    @Autowired
+    @Autowired 
     private JWTGenerator jwtGenerator;
 
-    // @Autowired
-    // private PasswordEncoder passwordEncoder;
-
-    public AuthController(AuthenticationManager authMan, UserRepository userRepo, RoleRepository roleRepo, JWTGenerator jwtGenerator, PasswordEncoder passwordEncoder) {
+    public AuthController(AuthenticationManager authMan, UserRepository userRepo, RoleRepository roleRepo, JwtService jwtService, PasswordEncoder passwordEncoder, JWTGenerator jwtGenerator) {
         this.authenticationManager = authMan;
         this.userRepository = userRepo;
         this.roleRepository = roleRepo; 
-        // this.passwordEncoder = passwordEncoder;
         this.jwtGenerator = jwtGenerator;
     }
 
