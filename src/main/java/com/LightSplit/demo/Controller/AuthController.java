@@ -23,7 +23,7 @@ import com.LightSplit.demo.Model.UserEntity;
 import com.LightSplit.demo.Repository.RoleRepository;
 import com.LightSplit.demo.Repository.UserRepository;
 import com.LightSplit.demo.Security.JWTGenerator;
-import com.LightSplit.demo.Service.JwtService;
+import com.LightSplit.demo.Security.JwtService;
 
 
 @RestController

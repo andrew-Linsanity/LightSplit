@@ -1,4 +1,4 @@
-package com.LightSplit.demo.Service;
+package com.LightSplit.demo.Security;
 
 import java.util.Base64;
 
@@ -6,7 +6,6 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.springframework.stereotype.Service;
 
-import com.LightSplit.demo.Security.SecurityConstants;
 import java.security.*;
 
 import io.jsonwebtoken.Claims;

@@ -11,7 +11,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.LightSplit.demo.Service.CustomUserDetailsService;
-import com.LightSplit.demo.Service.JwtService;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
