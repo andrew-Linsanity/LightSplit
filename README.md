@@ -20,8 +20,16 @@ So far, Light Split is a pure backend project built with Spring Boot and MongoDB
 2) a datatype long JWT_EXPIRATION that controls when a JWT expires (in milliseconds) 3) a string ADMIN_KEY to register with both USER and ADMIN role (See RegisterDTO.java)
 
 ### How to use Light Split 
-1. 
-
+I use Postman to send the request myself, but feel free to do it your way!
+1. Register as an user (or an admin for yourself)
+2. Login, copy the JWT string. Select bearer token for authorization, and whenever you send a request include this JWT string. 
+3. Create a group
+4. Add your friends to the group
+5. When a shared expenditure occurs, create an item.
+6. Choose a payer first, then split equally among selected travelers or customize how much each traveler owes the payer
+7. Add the item to your group.
+8. Repeat step 5 - 7 until the end of the trip
+9. Finalize the internal transactions with findMinimumTransaction endpoint, which returns minimum transactinos to share the travel expense. 
 
 
 
