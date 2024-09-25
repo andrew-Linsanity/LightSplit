@@ -5,6 +5,18 @@ booking hotels and renting a car. During the trip, more shared expenses will occ
 problem by minimizing such internal transactions at the end of the trip.** Just a few clicks to document who pays and who shares the expense and Light Split will keep track 
 of transaction.
 
+So far, Light Split is a pure backend project built with Spring Boot and MongoDB. Basic user authuentication and authorization are set up with Spring Security using Json Web Tokens(JWT). 
+
+### Future Feature 
+1. User interface 
+2. More sophisticated user authorization. Group creator should be able to verify who's joining the group, and people shouldn't have access to information from group they don't belong to. 
+
+### How to set up Light Split
+1. Clone this git repository locally.
+2. Create an account for mongoDB and download it. 
+
+### How to use Light Split
+
 
 
 
